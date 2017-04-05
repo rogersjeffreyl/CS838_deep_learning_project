@@ -12,13 +12,15 @@ def generate_train_data(args):
         data_file.columns =["center_cam_image","left_cam_image","right_cam_image",\
                             "angle","forward_throttle","reverse_throttle","speed"]
         center_images =   data_file["center_cam_image"].values
-        for image_file in center_images:                 
+        steering_angle =  data_file["angle"].values
+        
+        for index,image_file in enumerate(center_images):                 
            
            #image = Image.open(BytesIO(base64.b64decode(image_file)))
            #image_array = np.asarray(image)
            image_array = imread(image_file)
-           yield image_array
-
+           yield (image_array,steering_angle[index])
+           i=i+1
         
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Training Data')
