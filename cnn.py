@@ -4,7 +4,8 @@ from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
 from keras import backend as K
 from keras import regularizers
-
+import data_parser as dp
+import argparse
 def create_model(input_shape):
 	model = Sequential()
 
@@ -27,7 +28,16 @@ def create_model(input_shape):
               metrics=['accuracy'])
 
 def main():
-	input_shape = (200, 200, 3)
-	create_model(input_shape)
+    parser = argparse.ArgumentParser(description='Training Data')
+    parser.add_argument(
+        '-train_data',
+        type=str,
+        nargs='+',
+        help='Path to the train data'
+    )
+    args = parser.parse_args()
+    for value in dp.parse_data(args.train_data):
+    	print (value[0].shape)
+	#create_model(input_shape)
 main()
 

@@ -1,7 +1,6 @@
 from PIL import Image
 from io import BytesIO
 import pandas as pd
-import argparse
 import os
 import base64
 from scipy.misc import imread, imsave, imresize
@@ -20,19 +19,11 @@ def generate_train_data(args):
            #image_array = np.asarray(image)
            image_array = imread(image_file)
            yield (image_array,steering_angle[index])
-           i=i+1
+           
         
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Training Data')
-    parser.add_argument(
-        '-train_data',
-        type=str,
-        nargs='+',
-        help='Path to the train data'
-    )
-    args = parser.parse_args()
-    print (args) 
-    generate_train_data(args.train_data)
+def parse_data(args):
+    
+    return generate_train_data(args)
 
 
 	
