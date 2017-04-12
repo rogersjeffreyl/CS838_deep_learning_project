@@ -58,14 +58,15 @@ def main():
     )
 
     args = parser.parse_args()
-    
+    model_count=1
     for root, dirnames, filenames in os.walk(args.train_data_folder):
         for filename in fnmatch.filter(filenames, '*.csv'):
             file = os.path.join(root, filename)
             (x_train, y_train) = create_training_array(file)
-
+            print (dirname(file)+"/cnn" + str(model_count)+".h5")
             model = create_model(x_train[0].shape)
 
             model.fit(x_train, y_train, batch_size=64, epochs = 100, verbose = 1)
-            model.save(dirname(file)+"/cnn.h5")
+            model.save(dirname(file)+"/cnn" + str(model_count)+".h5")
+            model_count+=1
 main()
