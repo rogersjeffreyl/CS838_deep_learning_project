@@ -84,6 +84,8 @@ def main():
     final_y_train = numpy.array(final_y_train)            
     model = create_model(final_x_train[0].shape)
     model.fit(final_x_train, final_y_train, batch_size=int(args.batch_size), epochs = int(args.epochs), verbose = 1)
-    model.save(dirname(file)+"/cnn" + str(model_count)+".h5")            
-    model_count+=1
+    file_name = "_".join(["cnn", str(args.batch_size),str(args.epochs)])+".h5"
+    model.save(file_name) 
+    print ("Saving model as {0}".format(file_name))           
+    
 main()
