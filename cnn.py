@@ -6,7 +6,7 @@ from keras import backend as K
 from keras import regularizers
 import data_parser as dp
 import argparse
-import numpy
+import numpy 
 import glob
 import os
 from os.path import dirname
@@ -44,8 +44,8 @@ def create_training_array(train_data):
         y_train_arr.append(value[1])
         count+=1
 
-    x_train = numpy.array(x_train_arr)
-    y_train = numpy.array(y_train_arr)
+    x_train = x_train_arr
+    y_train = y_train_arr
 
     return (x_train, y_train)
 
@@ -53,20 +53,37 @@ def main():
     parser = argparse.ArgumentParser(description='Training Data Folder')
     parser.add_argument(
         '-train_data_folder',
+        nargs='+',
         type=str,
         help='Path to the train data folder'
+    )
+    parser.add_argument(
+        '-epochs',        
+        type=int,
+        help='Num epochs'
+    )
+    parser.add_argument(
+        '-batch_size',
+        type=str,
+        help='Batch Size'
     )
 
     args = parser.parse_args()
     model_count=1
-    for root, dirnames, filenames in os.walk(args.train_data_folder):
-        for filename in fnmatch.filter(filenames, '*.csv'):
-            file = os.path.join(root, filename)
-            (x_train, y_train) = create_training_array(file)
-            print (dirname(file)+"/cnn" + str(model_count)+".h5")
-            model = create_model(x_train[0].shape)
-
-            model.fit(x_train, y_train, batch_size=64, epochs = 100, verbose = 1)
-            model.save(dirname(file)+"/cnn" + str(model_count)+".h5")
-            model_count+=1
+    final_x_train=[]
+    final_y_train=[]
+    for train_data_folder in args.train_data_folder:
+	    for root, dirnames, filenames in os.walk(train_data_folder):
+	        for filename in fnmatch.filter(filenames, '*.csv'):
+	            file = os.path.join(root, filename)
+	            (x_train, y_train) = create_training_array(file)
+	            final_x_train =final_x_train+x_train
+	            final_y_train =final_y_train+y_train
+	            #print (dirname(file)+"/cnn" + str(model_count)+".h5")
+    final_x_train = numpy.array(final_x_train)            
+    final_y_train = numpy.array(final_y_train)            
+    model = create_model(final_x_train[0].shape)
+    model.fit(final_x_train, final_y_train, batch_size=int(args.batch_size), epochs = int(args.epochs), verbose = 1)
+    model.save(dirname(file)+"/cnn" + str(model_count)+".h5")            
+    model_count+=1
 main()

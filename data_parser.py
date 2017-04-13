@@ -3,6 +3,7 @@ from io import BytesIO
 import pandas as pd
 import os
 import base64
+import numpy
 from scipy.misc import imread, imsave, imresize
 def generate_train_data(args):
   arg=args
@@ -17,7 +18,12 @@ def generate_train_data(args):
      
      #image = Image.open(BytesIO(base64.b64decode(image_file)))
      #image_array = np.asarray(image)
-     image_array = imread(image_file)
+     image = Image.open(image_file)
+     width, height = image.size
+     image = image.crop((0,77 , width, height))
+     #image_array = imread(image_file)
+     image_array = numpy.array(image)
+     
      yield (image_array,steering_angle[index])
            
         
