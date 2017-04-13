@@ -1,6 +1,6 @@
 import keras
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten
+from keras.layers import Dense, Dropout, Flatten, Lambda
 from keras.layers import Conv2D, MaxPooling2D
 from keras import backend as K
 from keras import regularizers
@@ -15,7 +15,9 @@ import fnmatch
 def create_model(input_shape):
     model = Sequential()
 
-    model.add(Conv2D(24, kernel_size=(5, 5), strides=(2, 2), activation='elu', input_shape=input_shape))
+    model.add(Lambda(lambda x: x/127.5 - 1.0,input_shape=input_shape))
+
+    model.add(Conv2D(24, kernel_size=(5, 5), strides=(2, 2), activation='elu'))
     model.add(Conv2D(36, kernel_size=(5, 5), strides=(2, 2), activation='elu'))
     model.add(Conv2D(48, kernel_size=(5, 5), strides=(2, 2), activation='elu'))
 
@@ -27,10 +29,10 @@ def create_model(input_shape):
     model.add(Dense(100, activation='elu'))
     model.add(Dense(50, activation='elu'))
     model.add(Dense(10, activation='elu'))
-    model.add(Dense(1, activation='elu'))
+    model.add(Dense(1, activation='tanh'))
 
     model.compile(loss=keras.losses.mean_squared_error,
-              optimizer=keras.optimizers.Adadelta(),
+              optimizer=keras.optimizers.Adam(lr=1e-4),
               metrics=['accuracy'])
 
     return model
@@ -81,7 +83,8 @@ def main():
 	            final_y_train =final_y_train+y_train
 	            #print (dirname(file)+"/cnn" + str(model_count)+".h5")
     final_x_train = numpy.array(final_x_train)            
-    final_y_train = numpy.array(final_y_train)            
+    final_y_train = numpy.array(final_y_train)   
+    #print(final_x_train[0].shape)        
     model = create_model(final_x_train[0].shape)
     model.fit(final_x_train, final_y_train, batch_size=int(args.batch_size), epochs = int(args.epochs), verbose = 1)
     file_name = "_".join(["cnn", str(args.batch_size),str(args.epochs)])+".h5"
