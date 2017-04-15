@@ -89,7 +89,7 @@ def main():
     #print(final_x_train[0].shape)    
     #Adding early stopping callback
     callbacks.append(keras.callbacks.EarlyStopping(monitor='acc', min_delta=0.0001, patience=10, verbose=1, mode='auto'))    
-    callbacks.append(keras.callbacks.ModelCheckpoint("./models", monitor='acc', verbose=0, save_best_only=True, save_weights_only=False, mode='auto', period=10))
+    callbacks.append(keras.callbacks.ModelCheckpoint("./cnn_best_model", monitor='acc', verbose=0, save_best_only=True, save_weights_only=False, mode='auto', period=10))
     if keras.backend.backend() =="tensorflow":
         callbacks.append(keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=True))
         
