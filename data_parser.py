@@ -4,7 +4,7 @@ import pandas as pd
 import os
 import base64
 import numpy
-
+import ntpath
 from scipy.misc import imread, imsave, imresize
 def generate_train_data(args):
   arg=args
@@ -20,7 +20,7 @@ def generate_train_data(args):
      
      #image = Image.open(BytesIO(base64.b64decode(image_file)))
      #image_array = np.asarray(image)
-     image_folder, image_file = os.path.split(image_file)
+     image_folder, image_file = ntpath.split(image_file)
      image_file =os.path.join(csv_folder,"IMG",image_file)
      image = Image.open(image_file)
      width, height = image.size
