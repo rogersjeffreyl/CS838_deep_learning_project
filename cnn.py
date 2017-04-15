@@ -42,10 +42,15 @@ def create_training_array(train_data):
     y_train_arr = []
     count = 0
     for value in dp.parse_data(train_data):
-        x_train_arr.append(value[0])
-        y_train_arr.append(value[1])
-        count+=1
-
+        if value[1] ==0.0:
+            if random.uniform(0, 1)>0.9:
+                x_train_arr.append(value[0])
+                y_train_arr.append(value[1])
+                count+=1
+        else:
+            x_train_arr.append(value[0])
+            y_train_arr.append(value[1])
+            count+=1        
     x_train = x_train_arr
     y_train = y_train_arr
 
@@ -97,6 +102,6 @@ def main():
     model.fit(final_x_train, final_y_train, batch_size=int(args.batch_size), epochs = int(args.epochs), verbose = 1, callbacks=callbacks)
     file_name = "_".join(["cnn", str(args.batch_size),str(args.epochs)])+".h5"
     model.save(file_name) 
-    print ("Saving model as {0}".format(file_name))           
+    print ("Saving final model as {0}".format(file_name))           
     
 main()
