@@ -52,6 +52,7 @@ def create_training_array(train_data):
     return (x_train, y_train)
 
 def main():
+
     parser = argparse.ArgumentParser(description='Training Data Folder')
     parser.add_argument(
         '-train_data_folder',
@@ -70,6 +71,7 @@ def main():
         help='Batch Size'
     )
 
+    callbacks = []
     args = parser.parse_args()
     model_count=1
     final_x_train=[]
@@ -84,9 +86,15 @@ def main():
 	            #print (dirname(file)+"/cnn" + str(model_count)+".h5")
     final_x_train = numpy.array(final_x_train)            
     final_y_train = numpy.array(final_y_train)   
-    #print(final_x_train[0].shape)        
+    #print(final_x_train[0].shape)    
+    #Adding early stopping callback
+    callbacks.append(keras.callbacks.EarlyStopping(monitor='acc', min_delta=0.0001, patience=10, verbose=1, mode='auto'))    
+    callbacks.append(keras.callbacks.ModelCheckpoint("./models", monitor='acc', verbose=0, save_best_only=True, save_weights_only=False, mode='auto', period=10))
+    if keras.backend.backend() =="tensorflow":
+        callbacks.append(keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=True))
+        
     model = create_model(final_x_train[0].shape)
-    model.fit(final_x_train, final_y_train, batch_size=int(args.batch_size), epochs = int(args.epochs), verbose = 1)
+    model.fit(final_x_train, final_y_train, batch_size=int(args.batch_size), epochs = int(args.epochs), verbose = 1, callbacks=callbacks)
     file_name = "_".join(["cnn", str(args.batch_size),str(args.epochs)])+".h5"
     model.save(file_name) 
     print ("Saving model as {0}".format(file_name))           
