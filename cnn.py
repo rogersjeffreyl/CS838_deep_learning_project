@@ -16,7 +16,7 @@ import numpy.random as random
 def create_model(input_shape, mean):
     model = Sequential()
 
-    model.add(Lambda(lambda x: (x - mean)/255.0, input_shape=input_shape))
+    model.add(Lambda(lambda x: (x - mean)/127.5, input_shape=input_shape))
 
     model.add(Conv2D(24, kernel_size=(5, 5), strides=(2, 2), activation='elu'))
     model.add(Conv2D(36, kernel_size=(5, 5), strides=(2, 2), activation='elu'))
