@@ -6,16 +6,17 @@ from keras import backend as K
 from keras import regularizers
 import data_parser as dp
 import argparse
-import numpy 
+import numpy
 import glob
 import os
 from os.path import dirname
 import fnmatch
+import numpy.random as random
 
-def create_model(input_shape):
+def create_model(input_shape, mean):
     model = Sequential()
 
-    model.add(Lambda(lambda x: x/127.5 - 1.0,input_shape=input_shape))
+    model.add(Lambda(lambda x: (x - mean)/127.5, input_shape=input_shape))
 
     model.add(Conv2D(24, kernel_size=(5, 5), strides=(2, 2), activation='elu'))
     model.add(Conv2D(36, kernel_size=(5, 5), strides=(2, 2), activation='elu'))
@@ -50,7 +51,7 @@ def create_training_array(train_data):
         else:
             x_train_arr.append(value[0])
             y_train_arr.append(value[1])
-            count+=1        
+            count+=1
     x_train = x_train_arr
     y_train = y_train_arr
 
@@ -66,7 +67,7 @@ def main():
         help='Path to the train data folder'
     )
     parser.add_argument(
-        '-epochs',        
+        '-epochs',
         type=int,
         help='Num epochs'
     )
@@ -89,19 +90,20 @@ def main():
 	            final_x_train =final_x_train+x_train
 	            final_y_train =final_y_train+y_train
 	            #print (dirname(file)+"/cnn" + str(model_count)+".h5")
-    final_x_train = numpy.array(final_x_train)            
-    final_y_train = numpy.array(final_y_train)   
-    #print(final_x_train[0].shape)    
+    final_x_train = numpy.array(final_x_train)
+    final_y_train = numpy.array(final_y_train)
+    mean = final_x_train.mean(axis=0)
+    #print(final_x_train[0].shape)
     #Adding early stopping callback
-    callbacks.append(keras.callbacks.EarlyStopping(monitor='acc', min_delta=0.0001, patience=10, verbose=1, mode='auto'))    
+    callbacks.append(keras.callbacks.EarlyStopping(monitor='acc', min_delta=0.0001, patience=10, verbose=1, mode='auto'))
     callbacks.append(keras.callbacks.ModelCheckpoint("./cnn_best_model", monitor='acc', verbose=0, save_best_only=True, save_weights_only=False, mode='auto', period=10))
     if keras.backend.backend() =="tensorflow":
         callbacks.append(keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=True))
-        
-    model = create_model(final_x_train[0].shape)
+
+    model = create_model(final_x_train[0].shape, mean)
     model.fit(final_x_train, final_y_train, batch_size=int(args.batch_size), epochs = int(args.epochs), verbose = 1, callbacks=callbacks)
     file_name = "_".join(["cnn", str(args.batch_size),str(args.epochs)])+".h5"
-    model.save(file_name) 
-    print ("Saving final model as {0}".format(file_name))           
-    
+    model.save(file_name)
+    print ("Saving final model as {0}".format(file_name))
+
 main()
